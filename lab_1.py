@@ -1,3 +1,6 @@
+import time 
+
+
 class Task:
 	def __init__(self, taskName, actTime, execTime):
 		self.name = taskName
@@ -6,17 +9,17 @@ class Task:
 		self.endOfExecutionTime = 0
 
 
-class Dispatcher:
+class Dispatcher(): #Task):
 	def __init__(self, tasks):
 		self.time = 0
 		self.task_list = tasks
-		self.currentTask = self.task_list.pop(0)
+		self.currentTask =  Task("",0, self.task_list[0].actTime)
 		self.currentTask.endOfExecutionTime = self.currentTask.execTime
 		self.outOfTasks = False
 
+
 	def inc_time(self):
 		self.time += 1
-
 
 
 	def skip(self, num):
@@ -25,34 +28,32 @@ class Dispatcher:
 			self.time += 1
 
 
+	def print_task_state(self):
+		string = ""
+		for task in self.task_list:
+				if task.actTime <= self.time and not (self.currentTask.name == task.name):
+					string = string + " " + task.name
+		print(self.time, (" ")*(7+len("Имя")), self.currentTask.name, (" ")*(7+len("Задача")), string)
+
+
 
 	def check_current_task(self):
+
 		if self.currentTask.endOfExecutionTime == self.time:
-			if not self.task_list:
+
+			if len(self.task_list) == 0:
 				self.outOfTasks = True
 				return
 
-			string = ""
-
-
-			cur_task = self.task_list.pop(0)
-			
+			self.currentTask = self.task_list.pop(0)
 
 			for task in self.task_list:
-				if task.actTime <= self.time and not (cur_task.name == task.name):
-					string = string + " " + task.name
-				#print(string, " -в очереди")
 				try:
-					self.task_list.remove(cur_task)
+					self.task_list.remove(self.currentTask)
 				except ValueError:
-					num = cur_task.actTime - self.time
+					num = self.currentTask.actTime - self.time
 					self.skip(num)
-				self.currentTask = cur_task
-				self.currentTask.endOfExecutionTime = self.time + self.currentTask.execTime
-
-
-			print(self.time, "-task start time, ", cur_task.name, "-name of currenr task, ", "    ", string )
-
+			self.currentTask.endOfExecutionTime = self.time + self.currentTask.execTime
 
 
 def print_task_list(taskList):
@@ -60,17 +61,17 @@ def print_task_list(taskList):
 		print("Имя: " + str(task.name) + " " + " Время активизации: " + str(task.actTime) +
 			" Время выполнения: " + str(task.execTime))
 
-def run_modeling(tasks):
-	print('Время' + (" ")*len("-task start time, ") + "Задача" + (" ")*len( "-name of currenr task, ") + " Очередь")
 
-	run = True
-	print(0, "-task start time, ", str(tasks[0].name),  "-name of currenr task, ")
+def run_modeling(tasks):
+	print('Время' + (" ")*7 + "Задача" + (" ")*7 + " Очередь")
+
 	dispatcher = Dispatcher(tasks)
-	while run:
+	while not dispatcher.outOfTasks:
+
 		dispatcher.check_current_task()
+		dispatcher.print_task_state()
 		dispatcher.inc_time()
-		if dispatcher.outOfTasks:
-			run = False
+
 
 
 
@@ -81,8 +82,7 @@ for line in file:
 	taskName = data[0]
 	actTime = int(data[1])
 	execTime = int(data[2])
-	tasks.append(Task(taskName, actTime, execTime,))
-
+	tasks.append(Task(taskName, actTime, execTime))
 
 tasks = sorted(tasks, key=lambda x: x.actTime)
 print_task_list(tasks)
