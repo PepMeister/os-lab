@@ -1,3 +1,5 @@
+from time import sleep
+
 class Task:
 	def __init__(self, taskName, actTime, execTime, priority):
 		self.name = taskName
@@ -6,74 +8,104 @@ class Task:
 		self.endOfExecutionTime = 0
 		self.priority = priority
 
-class Dispatcher:
+
+class Dispatcher(): #Task):
 	def __init__(self, tasks):
 		self.time = 0
 		self.task_list = tasks
-		self.queue = []
-		self.currentTask = self.task_list.pop(0)
+		self.currentTask =  Task("",0, self.task_list[0].actTime, 0)
 		self.currentTask.endOfExecutionTime = self.currentTask.execTime
 		self.outOfTasks = False
+
 
 	def inc_time(self):
 		self.time += 1
 
 
-	def print_info(self): 
-		for task in self.task_list:
-
-
-			if task.actTime == self.time:
-				self.queue.append(task.name)
-		out = "" 
-		for sym in self.queue: 
-			out += sym + " " 
-		print(str(self.time) + " " + self.currentTask.name + " " + out)
-
-
-	def skip(self, num): 
-		for i in range(num): 
-			print(str(self.time) + " " + "-") 
+	def skip(self, num):
+		for i in range(num):
+			print(str(self.time) + " " + "-")
 			self.time += 1
 
 
-	def check_current_task(self): 
-		if self.currentTask.endOfExecutionTime == self.time: 
-			if not self.task_list: 
-				self.outOfTasks = True 
+	def print_task_state(self):
+		string = ""
+		for task in self.task_list:
+				if task.actTime <= self.time and not (self.currentTask.name == task.name):
+					string = string + " " + task.name
+		print(self.time, (" ")*(7+len("Имя")), self.currentTask.name, (" ")*(7+len("Задача")), string)
+
+
+
+	def check_current_task(self):
+		if self.currentTask.endOfExecutionTime == self.time:
+			if len(self.task_list) == 0:
+				self.outOfTasks = True
 				return
 
-			cur_task = self.task_list[0] 
-			for task in self.task_list:
-				if cur_task.priority < task.priority and task.name in self.queue:
-					cur_task = task
-			try:
-				self.task_list.remove(cur_task)
-				self.queue.remove(cur_task.name)
-			except ValueError:
-			    num = cur_task.actTime - self.time 
-			    self.skip(num)
+			self.currentTask = self.task_list.pop(0)
 
-			self.currentTask = cur_task 
+			for task in self.task_list:
+				try:
+					self.task_list.remove(self.currentTask)
+				except ValueError:
+					num = self.currentTask.actTime - self.time
+					self.skip(num)
 			self.currentTask.endOfExecutionTime = self.time + self.currentTask.execTime
 
 
-def print_task_list(taskList): 
-	for task in taskList:
-	    print("Имя: " + str(task.name) + " " + " Время активизации: " + str(task.actTime) + " Время выполнения: " + str(task.execTime) + " Приоритет: " + str(task.priority))
 
+		_task = Task("",0, 0, 0)
+		for task in self.task_list:
+			if task.actTime == self.time and task.priority > self.currentTask.priority:
+				_task = task
+				break
+
+		_i = 0
+		i = 0
+		for task in self.task_list:
+			i+=1
+			if task.actTime == self.time and task.priority > self.currentTask.priority and task.priority > _task.priority:
+				_i=i
+				_task = task
+
+
+		if (_task.name != ""):
+			self.currentTask.execTime=(self.currentTask.endOfExecutionTime - self.time)
+			self.task_list.append(self.currentTask)
+
+			self.currentTask = self.task_list.pop(_i)
+			self.currentTask.endOfExecutionTime = self.time + self.currentTask.execTime
+
+
+
+		for task in self.task_list:
+			try:
+				self.task_list.remove(self.currentTask)
+			except ValueError:
+				num = self.currentTask.actTime - self.time
+				self.skip(num)
+
+
+
+
+
+
+def print_task_list(taskList):
+	for task in taskList:
+		print("Имя: " + str(task.name) + " " + " Время активизации: " + str(task.actTime) +
+			" Время выполнения: " + str(task.execTime))
 
 
 def run_modeling(tasks):
-    print('t' + " " + "Задача" + " Очередь") 
-    run = True 
-    dispatcher = Dispatcher(tasks) 
-    while run:
-    	dispatcher.print_info() 
-    	dispatcher.inc_time() 
-    	dispatcher.check_current_task() 
-    	if dispatcher.outOfTasks: 
-    	    run = False
+	print('Время' + (" ")*7 + "Задача" + (" ")*7 + " Очередь")
+
+	dispatcher = Dispatcher(tasks)
+	while not dispatcher.outOfTasks:
+		sleep(0.1)
+		dispatcher.check_current_task()
+		dispatcher.print_task_state()
+		dispatcher.inc_time()
 
 
 
@@ -88,6 +120,6 @@ for line in file:
 	tasks.append(Task(taskName, actTime, execTime, priority))
 
 
-tasks = sorted(tasks, key=lambda x: x.execTime)
+tasks = sorted(tasks, key=lambda x: x.actTime)
 print_task_list(tasks) 
 run_modeling(tasks)
