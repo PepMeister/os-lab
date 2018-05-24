@@ -89,6 +89,11 @@ class Example(QMainWindow):
 		self.label8.resize(200, 25)
 		self.label8.setText("Process K")
 
+		self.label9 = QLabel(self)
+		self.label9.move(20, 265+100)
+		self.label9.resize(800, 200)
+		self.label9.setText("..")
+
 
 		mainMenu = self.menuBar()
 		fileMenu = mainMenu.addMenu('Файл')
@@ -162,6 +167,8 @@ class Example(QMainWindow):
 			print('A() -', self.D_E_F_start)
 			if self.D_E_F_start == 3:
 				print("A завершила работу последней..")
+				self.label9.setText("A завершила работу последней; активация D, E, F..")
+
 				_d = Thread(target=self.D, args=())
 				_e = Thread(target=self.E, args=())
 				_f = Thread(target=self.F, args=())
@@ -194,6 +201,8 @@ class Example(QMainWindow):
 
 			if self.D_E_F_start == 3:
 				print("B завершила работу последней..")
+				self.label9.setText("B завершила работу последней; активация D, E, F..")
+
 				_d = Thread(target=self.D, args=())
 				_e = Thread(target=self.E, args=())
 				_f = Thread(target=self.F, args=())
@@ -228,6 +237,8 @@ class Example(QMainWindow):
 
 			if self.D_E_F_start == 3:
 				print("C завершила работу последней..")
+				self.label9.setText("C завершила работу последней; активация D, E, F..")
+
 				_d = Thread(target=self.D, args=())
 				_e = Thread(target=self.E, args=())
 				_f = Thread(target=self.F, args=())
@@ -288,6 +299,7 @@ class Example(QMainWindow):
 			print('F() -', self.K_start)
 			if self.K_start == 3:
 				print("F завершила работу последней..")
+				self.label9.setText("F завершила работу последней; активация К..")
 				_k = Thread(target=self.K, args=())
 				_k.daemon = True
 				_k.start()
@@ -314,6 +326,7 @@ class Example(QMainWindow):
 			print('G() -', self.K_start)
 			if self.K_start == 3:
 				print("G завершила работу последней..")
+				self.label9.setText("G завершила работу последней; активация К..")
 				_k = Thread(target=self.K, args=())
 				_k.daemon = True
 				_k.start()
@@ -339,6 +352,7 @@ class Example(QMainWindow):
 			print('H() -', self.K_start)
 			if self.K_start == 3:
 				print("H завершила работу последней..")
+				self.label9.setText("H завершила работу последней; активация К..")
 				_k = Thread(target=self.K, args=())
 				_k.daemon = True
 				_k.start()
@@ -356,6 +370,8 @@ class Example(QMainWindow):
 		self.bar_K.setValue(100)
 		self.F6()
 		print("процесс K завершен, результат:")
+		self.label9.setText("процесс K завершен, результат:" + "\n" +str(self.M_arr) +"\n" + str(self.R1_arr) +"\n" + str(self.R2_arr) )
+
 		self.print_result()
 		return
 
